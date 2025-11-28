@@ -13,14 +13,14 @@ provider "aws" {
 }
 
 # =========================
-# DynamoDB: Tabla de URLs
+# DynamoDB
 # =========================
 resource "aws_dynamodb_table" "short_urls" {
   name         = "${var.project_name}-short-urls-${var.environment}"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "PK"
   range_key    = "SK"
-  
+
   attribute {
     name = "PK"
     type = "S"
@@ -50,7 +50,7 @@ resource "aws_dynamodb_table" "short_urls" {
 }
 
 # =========================
-# IAM Role para Lambda
+# IAM Role
 # =========================
 resource "aws_iam_role" "lambda_role" {
   name = "${var.project_name}-shorten-lambda-role-${var.environment}"
@@ -99,12 +99,12 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
 }
 
 # =========================
-# Lambda: shorten
+# Lambda
 # =========================
 resource "aws_lambda_function" "shorten_lambda" {
   function_name = "${var.project_name}-shorten-${var.environment}"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "index.handler" 
+  handler       = "index.createURLHandler"
   runtime       = "nodejs20.x"
 
   filename         = var.lambda_zip_path
@@ -123,7 +123,7 @@ resource "aws_lambda_function" "shorten_lambda" {
 }
 
 # =========================
-# API Gateway HTTP API v2
+# API Gateway
 # =========================
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "${var.project_name}-http-api-${var.environment}"

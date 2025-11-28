@@ -1,8 +1,11 @@
-name: Deploy URL Short
+name: Deploy URL Shortener (Short)
 
 on:
   push:
-    branches: [ "main", "master", "develop" ]
+    branches:
+      - main
+      - master
+      - develop
   workflow_dispatch:
 
 env:
@@ -19,7 +22,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      # Instala todo para poder correr tests si los tuvieras
+      
+      # Instala todas las dependencias para poder ejecutar tests
       - run: npm ci
 
   build:

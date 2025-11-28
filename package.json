@@ -1,5 +1,5 @@
 {
-  "name": "url-shortener-v2",
+  "name": "short",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
