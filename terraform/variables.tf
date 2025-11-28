@@ -14,7 +14,7 @@ variable "environment" {
   description = "Environment (dev, prod)"
   type        = string
   default     = "dev"
-}
+} 
 
 variable "base_url" {
   description = "Base URL for short links"
