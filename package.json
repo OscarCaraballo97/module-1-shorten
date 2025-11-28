@@ -1,0 +1,23 @@
+{
+  "name": "url-shortener-module-1",
+  "version": "1.0.0",
+  "description": "Lambda function for creating shortened URLs (Module 1)",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && node scripts/package.js",
+    "package": "node scripts/package.js",
+    "test": "echo \"No tests configured yet\" && exit 0",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.159",
+    "@types/node": "^20.19.25",
+    "archiver": "^7.0.1",
+    "eslint": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}
