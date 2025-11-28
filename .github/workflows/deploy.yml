@@ -1,4 +1,4 @@
-name: Deploy URL Shortener v2
+name: Deploy URL Short
 
 on:
   push:
