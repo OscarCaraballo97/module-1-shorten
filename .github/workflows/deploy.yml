@@ -23,7 +23,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       
-      # Instala todas las dependencias para poder ejecutar tests
+   
       - run: npm ci
 
   build:
@@ -36,16 +36,16 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       
-      # 1. Instalar TODO (incluido dev) para que 'tsc' funcione
+     
       - run: npm ci
       
-      # 2. Compilar TypeScript
+     
       - run: npm run build
       
-      # 3. Borrar dependencias dev para que la lambda sea ligera
+     
       - run: npm prune --production
       
-      # 4. Crear ZIP con la estructura correcta
+     
       - name: Create ZIP
         run: |
           cd dist
@@ -83,6 +83,13 @@ jobs:
         working-directory: terraform
         run: terraform init
         
+      - name: Terraform Plan
+        working-directory: terraform
+        run: |
+          terraform plan \
+            -var="lambda_zip_path=../lambda.zip" \
+            -var="base_url=${{ secrets.SHORT_URL_BASE }}"
+            
       - name: Terraform Apply
         working-directory: terraform
         run: |
