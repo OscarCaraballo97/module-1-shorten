@@ -6,7 +6,6 @@ terraform {
       version = "~> 5.0"
     }
   }
- 
 }
 
 provider "aws" {
@@ -21,7 +20,7 @@ resource "aws_dynamodb_table" "short_urls" {
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "PK"
   range_key    = "SK"
-
+  
   attribute {
     name = "PK"
     type = "S"

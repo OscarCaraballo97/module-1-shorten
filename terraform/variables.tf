@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Project name"
   type        = string
-  default     = "url-shorten"
+  default     = "url-shortener-v2"
 }
 
 variable "environment" {

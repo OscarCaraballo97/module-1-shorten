@@ -1,10 +1,8 @@
-name: Deploy Module 1 - URL Shorten Lambda
+name: Deploy URL Shortener v2
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [ "main", "master", "develop" ]
   workflow_dispatch:
 
 env:
@@ -15,54 +13,43 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      # Instala todo para poder correr tests si los tuvieras
+      - run: npm ci
 
   build:
-    name: Build Lambda Package
+    name: Build Lambda
     runs-on: ubuntu-latest
     needs: test
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-     
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build TypeScript
-        run: npm run build
-
-   
-      - name: Prune dev dependencies
-        run: npm prune --production
-
-      - name: Create deployment package
+      
+      # 1. Instalar TODO (incluido dev) para que 'tsc' funcione
+      - run: npm ci
+      
+      # 2. Compilar TypeScript
+      - run: npm run build
+      
+      # 3. Borrar dependencias dev para que la lambda sea ligera
+      - run: npm prune --production
+      
+      # 4. Crear ZIP con la estructura correcta
+      - name: Create ZIP
         run: |
           cd dist
           zip -r ../lambda.zip .
           cd ..
           zip -r lambda.zip node_modules
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+          
+      - uses: actions/upload-artifact@v4
         with:
           name: lambda-package
           path: lambda.zip
@@ -71,46 +58,34 @@ jobs:
     name: Deploy to AWS
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      
+      - uses: actions/download-artifact@v4
         with:
           name: lambda-package
           path: .
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+          
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
+          
+      - uses: hashicorp/setup-terraform@v3
+      
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
-
-      - name: Terraform Plan
-        working-directory: terraform
-        run: |
-          terraform plan \
-            -var="lambda_zip_path=../lambda.zip" \
-            -var="base_url=${{ secrets.SHORT_URL_BASE }}"
-
+        
       - name: Terraform Apply
         working-directory: terraform
         run: |
           terraform apply -auto-approve \
             -var="lambda_zip_path=../lambda.zip" \
             -var="base_url=${{ secrets.SHORT_URL_BASE }}"
-
-      - name: Output deployment info
+            
+      - name: Output URL
         working-directory: terraform
         run: terraform output
